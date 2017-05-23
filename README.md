@@ -34,23 +34,21 @@ docker run -t -i coder36/mern
 image: "coder36/mern"
 
 stages:
-  - cucumber
+  - run_tests
 
 cache:
   paths:
-    - vendor
     - node_modules
-cucumber:
-  stage: cucumber
+
+mocha:
+  stage: run_tests
   script:
-  - rvm use 2.2.3
-  - ruby -v                                     
-  - gem install bundler  --no-ri --no-rdoc    
-  - bundle install -j $(nproc) --path vendor 
-  - npm install
-  - npm start &
-  - sleep 10 
-  - export DISPLAY=:99
-  - /etc/init.d/xvfb start
-  - bundle exec cucumber --format html --out cucumber.html --format pretty --format json --out tests.cucumber
+  - yarn install
+  - npm-run nf --procfile Procfile.test start > /dev/null 2>&1 & 
+  - sleep 5
+  - npm test
+  - gem install dpl
+  - dpl --provider=heroku --app=my_app --api-key=$HEROKU_API_KEY  
+  environment:
+    name: training
 ```
